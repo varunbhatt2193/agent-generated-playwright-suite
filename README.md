@@ -1,6 +1,6 @@
 # Agent-Generated Playwright Suite
 
-**I asked an AI agent to write an automated test suite for a web app — then I measured how good the
+**Asked an AI agent to write an automated test suite for a web app — then I measured how good the
 tests actually were, instead of assuming.**
 
 Then I did it a second time, after giving the agent a written guide to good testing practice, to find
