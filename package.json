@@ -8,7 +8,8 @@
     "test": "playwright test",
     "test:smoke": "PW_TEST_DIR=smoke playwright test",
     "lint": "eslint .",
-    "lint:info": "eslint -c eslint.informational.mjs ."
+    "lint:info": "eslint -c eslint.informational.mjs .",
+    "lint:ci": "eslint -c eslint.ci.mjs ."
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",

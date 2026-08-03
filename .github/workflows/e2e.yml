@@ -19,9 +19,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
-        env:
-          # Points at the smoke test until the repaired suite is promoted into tests/.
-          PW_TEST_DIR: smoke
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -45,4 +42,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run lint
+      # eslint.config.mjs is the frozen measurement instrument, not a linter to ship against;
+      # see eslint.ci.mjs for why CI uses the corrected configuration.
+      - run: npm run lint:ci

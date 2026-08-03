@@ -1,0 +1,18 @@
+{
+  "suiteDir": "arms/b-skill/run-2",
+  "files": 8,
+  "gate": {
+    "total": 16,
+    "byRule": {
+      "playwright/expect-expect": 16
+    },
+    "unparseable": []
+  },
+  "informational": {
+    "noRawLocators": 3
+  },
+  "grepSuspects": {
+    "Brittle selectors": 3,
+    "UI bypass": 8
+  }
+}

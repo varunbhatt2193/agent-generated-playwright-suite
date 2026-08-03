@@ -1,8 +1,11 @@
-# Failure taxonomy — arm A (no skill)
+# Failure taxonomy
 
-Three generation runs, 193 tests, measured under `docs/protocol.md`. Every count below comes from
-`metrics/a-run-{1,2,3}/`; every classification comes from reading the code, with the snippet quoted so
-the judgment can be argued with.
+Six generation runs, 402 tests, measured under `docs/protocol.md`. Sections 1–6 catalogue arm A (no
+skill); the arm B comparison and the headline result are at the end. Every count comes from
+`metrics/`; every classification comes from reading the code, with the snippet quoted so the judgment
+can be argued with.
+
+**If you read one thing, read [The gate inverts the comparison](#the-gate-inverts-the-comparison).**
 
 Method: the pinned ESLint gate and the grep heuristics flag suspects mechanically, then each suspect
 is confirmed or rejected by hand. Run 1 was additionally read end to end, all eight files.
@@ -183,11 +186,108 @@ Run 3, `completing.spec.ts:111`, passed 9 of 10 runs. The failure was a 30-secon
 parallel load. Recorded as flake because the protocol counts an inconsistent result as flake
 regardless of cause, and noted here as environmental because that is what the trace shows.
 
-## What this implies for the skill
+---
 
-Arm B's skill is written against what was actually observed rather than what was expected: prefer
-semantic locators over CSS classes for structural elements (run 2's nine hits), address items by
-content rather than list position (run 3), and assert on what the user can see, with storage checks as
-a supplement rather than a substitute (run 3's one test). Whether stating those conventions changes
-anything is the question arm B answers — and with a baseline this strong, "no measurable difference"
-is a plausible outcome that will be reported as readily as any other.
+# Arm B — the same prompt, plus a conventions skill
+
+The skill was written against the weaknesses above: semantic locators for structural elements, address
+items by content rather than position, assert on the rendered view. All three arm B transcripts
+confirm it loaded before any test was written.
+
+Both arms were re-measured back to back, interleaved A/B/A/B/A/B, because arm A's first measurement
+ran while the machine was under heavy memory load and its one flaky test was a navigation timeout —
+comparing that against arm B on a quiet machine would have credited the skill for a closed browser.
+The recheck bore that out: arm A's flake disappeared under quiet conditions. Machine conditions are
+recorded in `metrics/conditions.md`.
+
+| | A1 | A2 | A3 | B1 | B2 | B3 |
+|---|---|---|---|---|---|---|
+| Tests | 66 | 61 | 66 | 71 | 74 | 64 |
+| First-run pass rate | 100% | 100% | 100% | 100% | 100% | 100% |
+| Flake rate | 0% | 0% | 0% | 0% | 1.4% | 0% |
+| Isolation failures | 0 | 0 | 0 | 0 | 0 | 0 |
+| Parallel failures | 0 | 1 | 0 | 0 | 0 | 0 |
+| **Gate violations (raw)** | 0 | 6 | 1 | **28** | **16** | **31** |
+| **Confirmed brittle selectors** | 0 | 11 | 2 | **0** | **0** | **1** |
+| Generation cost | $2.64 | $2.01 | — | $3.71 | $2.96 | $2.45 |
+
+## The gate inverts the comparison
+
+Read the raw gate row and arm B is catastrophically worse: 75 violations to arm A's 7, more than ten
+times as many. Read the confirmed row and arm B is dramatically better: 1 real brittle selector to arm
+A's 13.
+
+Both rows are correct. They disagree because **every one of arm B's 75 gate hits is a false positive**,
+and they are false positives *caused by the skill working*. The skill tells the agent to put assertion
+helpers on the page object; arm B did exactly that; `expect-expect` cannot see an assertion inside a
+helper:
+
+```ts
+async expectVisibleTodos(titles: string[]): Promise<void> {
+  await expect(this.titles).toHaveText(titles);     // arm B run 1, pages/todo-page.ts
+}
+```
+
+Arm B run 3 adds a second variety — `valid-expect` firing six times on assertions built through a
+variable, which are also real and also awaited:
+
+```ts
+const assertion = visible ? expect(this.toggleAllCheckbox) : expect(this.toggleAllCheckbox).not;
+await assertion.toBeVisible();                       // arm B run 3, pages/todo-page.ts:166
+```
+
+The lesson generalises past this repo: **an automated rubric measures what it can parse, and an
+intervention that changes code structure can move a suite outside what the rubric parses.** Any A/B of
+a coding agent that scores output automatically is exposed to this, and the failure is silent — the
+numbers stay plausible, they just point the wrong way. Nothing in the raw counts hints that the
+worse-scoring arm is the better one. Only reading the code found it.
+
+This is also why `arms/b-skill/repaired/` contains no repairs. Satisfying the pre-registered "zero gate
+violations" criterion would have meant deleting the helpers to please a rule that is wrong about them.
+
+## Where the skill actually changed the output
+
+**Brittle selectors — the thing it targeted.** Arm A used CSS class selectors for structural elements
+eleven times in run 2 alone (`.main`, `.footer`, `.filters`, `li.editing`, `label[for="toggle-all"]`)
+and twice more in run 3 (`button.destroy`, `input.edit`). Arm B used one, in a single page object:
+
+```ts
+await expect(this.page.locator('.filters a.selected')).toHaveText(name);   // arm B run 3, the only one
+```
+
+Every other raw locator in arm B — nine across three runs — is a markup-injection check of the form
+`locator('b')` or `locator('script')`, asserting that user input is not rendered as an element. There
+is no role or label for "a tag that should not exist", so those are correct usage in both arms.
+
+**Consistency, which matters more than the mean.** Arm A's raw-locator count per run was 1, 12, 3.
+Arm B's was 3, 3, 3. The skill's clearest effect is not that the best run got better — arm A run 1 was
+already clean — but that the worst run stopped happening. For anyone deciding whether to write a skill,
+that is the argument: it raises the floor.
+
+**Structure.** All three arm B runs produced a `pages/` directory and a `fixtures.ts` supplying a
+Playwright fixture; no arm A run created a fixture file at all.
+
+```ts
+export const test = base.extend<{ todoPage: TodoPage }>({
+  todoPage: async ({ page }, use) => { ... },        // arm B run 1, fixtures.ts
+});
+```
+
+**Volume.** 209 tests to arm A's 193, about 8% more.
+
+## Where it changed nothing
+
+First-run pass rate was 100% in all six runs, with or without the skill. Isolation and parallel
+behaviour were clean in both arms. Flake was indistinguishable from zero in both once measured under
+matched conditions — the two flaky results across all twelve measured suites were both navigation
+timeouts, and both vanished on re-measurement.
+
+Hard waits were absent from all 402 tests. The failure mode this project was built to catalogue never
+appeared, in either arm, and the skill's rule against it had nothing to prevent.
+
+## What it cost
+
+Arm B averaged $3.04 per run against arm A's $2.33, roughly 30% more, and took more turns —
+78, 46 and 38 against arm A's 44 and 32. The skill makes the agent work harder. On this evidence it
+buys a higher floor on locator quality and a consistent test structure, and buys nothing at all on
+pass rate, flake or isolation, because there was nothing left to buy.

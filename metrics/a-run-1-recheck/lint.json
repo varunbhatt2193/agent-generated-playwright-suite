@@ -1,0 +1,15 @@
+{
+  "suiteDir": "arms/a-baseline/run-1",
+  "files": 8,
+  "gate": {
+    "total": 0,
+    "byRule": {},
+    "unparseable": []
+  },
+  "informational": {
+    "noRawLocators": 1
+  },
+  "grepSuspects": {
+    "UI bypass": 7
+  }
+}
