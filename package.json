@@ -1,0 +1,12 @@
+{
+  "name": "todomvc-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end tests for the TodoMVC demo app.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  }
+}
