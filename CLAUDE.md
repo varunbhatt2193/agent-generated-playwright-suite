@@ -27,7 +27,8 @@ touching anything measurement-related.
 - `PW_WORKERS=1 PW_TEST_DIR=<dir> npm test` — sequential run, as used for measurement
 - `npm run lint` — the convention gate (eslint-plugin-playwright)
 - `node scripts/measure.mjs <suiteDir> <outDir>` — 10 runs + isolation + parallel probe → summary
-- `scripts/generate-arm.sh <a|b> <n>` — one generation run in a fresh worktree
+- `node scripts/lint-suite.mjs <suiteDir> <outDir>` — gate + informational rules + grep suspects
+- `scripts/generate-arm.sh <a|b> <n>` — one generation run in a throwaway export of the tagged base
 
 ## Layout
 
