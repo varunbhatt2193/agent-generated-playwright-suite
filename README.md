@@ -29,6 +29,8 @@ rules I committed to *before* running anything are published here.
 code showed it made them 13× better.** The score was measuring something it could no longer see. That
 gap — between a metric and the truth — is what this project is really about.
 
+→ **[Skip to the conclusion](#the-conclusion)** if you want the four takeaways and nothing else.
+
 ## How it works
 
 ```mermaid
@@ -132,6 +134,31 @@ First-run pass rate was 100% in all six runs. Isolation and parallel behaviour w
 Flake was indistinguishable from zero once both arms were measured under matched conditions. And **no
 hard wait appeared in any of the 402 tests** — the failure mode this project was built to catalogue
 never occurred, so the skill's rule against it had nothing to prevent.
+
+### The conclusion
+
+**1. The agent was better at this than expected, and the baseline is the surprise.** Without any
+guidance it produced a page object, role-based locators and web-first assertions unprompted, and all
+402 tests passed on the first attempt. The question going in was "how much does the agent get wrong?"
+The answer was: less than the premise assumed. Most of what a conventions guide would teach, it
+already did.
+
+**2. Judge an intervention on its worst run, not its average.** The skill's benefit was almost
+invisible in the means — 4% on cost, 8% on test count, nothing on pass rate — and obvious in the
+spread. It removed arm A's bad day: the eleven hand-confirmed brittle selectors arm A produced in a
+single run became one across all of arm B, and the cost range halved. A team adopting this would feel it as *fewer bad
+mornings*, which is exactly the benefit an averaged A/B is worst at detecting.
+
+**3. An automated quality metric stops being valid the moment the code changes shape.** This is the
+finding I did not expect and the one I would carry to other work. My lint gate was defensible, frozen
+in advance, and confidently wrong by a factor of ten — not because the rule was buggy, but because the
+intervention moved assertions somewhere the rule cannot look. Nothing errored. The numbers stayed
+plausible. **A metric that silently narrows its own scope is more dangerous than one that breaks**,
+and the only thing that caught it was reading all 402 tests by hand.
+
+**4. So: would I ship agent-generated tests?** Yes — with one non-negotiable human pass over the
+locators. That read-through was the only step in the entire pipeline that found the real defect;
+everything automated agreed with itself and pointed the wrong way.
 
 ---
 
