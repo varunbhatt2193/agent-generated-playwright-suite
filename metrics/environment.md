@@ -20,6 +20,10 @@ than a general claim.
 | TypeScript | 6.0.3 |
 | Target app | https://demo.playwright.dev/todomvc/ — static GitHub Pages, title `React • TodoMVC` |
 
+Claude Code's global settings on this machine are `model: opus`, `effortLevel: high`. Generation runs
+override the model explicitly with `--model claude-opus-5`; the effort level is inherited and applies
+identically to both arms.
+
 The generator model is pinned by full ID for the same reason the packages are: an alias that silently
 points at a newer model partway through would break the comparison between arms, and the whole claim
 rests on the two arms differing by exactly one thing.

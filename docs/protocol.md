@@ -33,10 +33,19 @@ agent-generated test suite — and in what specific ways?
   the absolute URL, which the prompt supplies.
 - **Prompt:** `prompts/generation-prompt.md`, identical in both arms. It says what to build, not how —
   no locator, waiting, or structure guidance, because that guidance is the experimental variable.
-- **Isolation:** each generation run happens in a fresh `git worktree` checked out at a fixed tag,
-  in a fresh session with no conversation history and no access to other runs' output.
-  Arm A worktrees (`gen-base-a`) contain no skill. Arm B worktrees (`gen-base-b`) are identical plus
-  `.claude/skills/playwright-conventions/SKILL.md`. Nothing else differs between arms.
+- **Isolation, and what the agent is allowed to see.** Each run happens in a throwaway `git archive`
+  export of a tagged generation base, in a fresh session with no conversation history and no access to
+  any other run's output. The base is an orphan commit holding four files — `package.json`,
+  `package-lock.json`, `playwright.config.ts`, `.gitignore` — and deliberately **not** this repo's
+  README, `CLAUDE.md`, protocol, ESLint config, or git history. That exclusion is load-bearing rather
+  than tidiness: Claude Code loads `CLAUDE.md` automatically, so a plain worktree would have announced
+  to the agent that it was being measured, and the committed ESLint config enumerates the exact rules
+  its output is scored against. An agent that can read the rubric is not the thing being measured.
+  The base also carries no example test, so nothing in it demonstrates a locator or waiting style.
+  Its `playwright.config.ts` is functionally identical to this repo's — same env switches, same
+  `retries: 0` — differing only in comments, which are written neutrally for the same reason.
+  Arm A uses `gen-base-a`. Arm B uses `gen-base-b`: the same tree plus
+  `.claude/skills/playwright-conventions/SKILL.md`. Nothing else differs between the arms.
 - **The agent may run its suite while generating.** That is how these tools are actually used, and
   forbidding it would measure something no one ships. All metrics below come from our re-execution
   of the committed raw output afterward.

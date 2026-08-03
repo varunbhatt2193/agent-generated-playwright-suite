@@ -1,25 +1,21 @@
-# Generation prompt
+# The generation prompt
 
-Frozen before any run; identical for every run in both arms. The text between the rules below is the
-**entire** prompt each generation session receives. No follow-up messages, no steering. It deliberately
-says what to build, not how to build it — locator choice, waiting strategy, structure, and coverage
-judgment are the agent's, because that judgment is what the experiment measures.
+The literal prompt is **[`task.txt`](task.txt)** — that file is what `scripts/generate-arm.sh` pipes
+into `claude -p`, byte for byte, and it is the only instruction any generation session receives. There
+are no follow-up messages and no steering. This file explains the design; it is never sent to the
+agent.
 
----
+Two properties matter, and both are easy to get wrong:
 
-This repo has Playwright set up: TypeScript, @playwright/test, Chromium, config in
-playwright.config.ts. The app under test is https://demo.playwright.dev/todomvc — a standard
-TodoMVC implementation.
+**It says what to build, not how.** No guidance on locators, waiting, structure, or coverage depth.
+That guidance is the experimental variable — it is exactly what the arm B skill supplies — so putting
+any of it in the shared prompt would shrink the very difference the experiment sets out to measure.
 
-Write an end-to-end test suite for this app.
+**It is kept separate from the explanation.** The prompt lives alone in a plain text file rather than
+being quoted inside a document like this one, because a script that extracts a prompt from prose is a
+script that can silently send the prose too. Feeding the agent a paragraph about how it is being
+measured would change what it writes.
 
-- First explore the app with the Playwright MCP browser tools to learn its actual behavior. Don't
-  work from assumptions about how TodoMVC apps usually behave.
-- Cover the features you find thoroughly.
-- Put all test files under tests/ in this repo. Don't change playwright.config.ts and don't add
-  dependencies.
-- The suite should pass when you're done: run it with `npx playwright test` and fix what fails.
-
-When finished, reply with a one-paragraph summary of what you covered.
-
----
+The prompt does tell the agent to explore the live app first and to run the suite before finishing.
+Both are deliberate: that is how these tools are actually used, and a prompt that forbade them would
+measure a workflow nobody ships.
