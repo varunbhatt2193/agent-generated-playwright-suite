@@ -1,0 +1,18 @@
+{
+  "suiteDir": "arms/a-baseline/run-3",
+  "files": 8,
+  "gate": {
+    "total": 1,
+    "byRule": {
+      "playwright/expect-expect": 1
+    },
+    "unparseable": []
+  },
+  "informational": {
+    "noRawLocators": 3
+  },
+  "grepSuspects": {
+    "Brittle selectors": 2,
+    "UI bypass": 8
+  }
+}

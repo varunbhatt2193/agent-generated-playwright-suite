@@ -1,0 +1,62 @@
+[
+  {
+    "run": "a-run-1",
+    "turns": 44,
+    "seconds": 569,
+    "costUsd": 2.6435639999999996,
+    "mcpCalls": 21,
+    "toolCalls": {
+      "ToolSearch": 1,
+      "Bash": 9,
+      "mcp__playwright__browser_navigate": 1,
+      "mcp__playwright__browser_type": 1,
+      "mcp__playwright__browser_evaluate": 1,
+      "mcp__playwright__browser_run_code_unsafe": 18,
+      "Write": 8,
+      "Edit": 4
+    },
+    "skillMentioned": false
+  },
+  {
+    "run": "a-run-2",
+    "turns": 32,
+    "seconds": 519,
+    "costUsd": 2.013358,
+    "mcpCalls": 11,
+    "toolCalls": {
+      "Bash": 6,
+      "ToolSearch": 1,
+      "mcp__playwright__browser_navigate": 1,
+      "Read": 3,
+      "mcp__playwright__browser_type": 1,
+      "mcp__playwright__browser_evaluate": 1,
+      "mcp__playwright__browser_run_code_unsafe": 8,
+      "Write": 7,
+      "Edit": 3
+    },
+    "skillMentioned": false
+  },
+  {
+    "run": "a-run-3",
+    "turns": 115,
+    "seconds": 786,
+    "costUsd": 4.8675255,
+    "mcpCalls": 89,
+    "toolCalls": {
+      "Bash": 7,
+      "ToolSearch": 3,
+      "mcp__playwright__browser_navigate": 5,
+      "mcp__playwright__browser_snapshot": 2,
+      "mcp__playwright__browser_evaluate": 38,
+      "mcp__playwright__browser_type": 17,
+      "mcp__playwright__browser_click": 20,
+      "mcp__playwright__browser_press_key": 3,
+      "mcp__playwright__browser_hover": 2,
+      "mcp__playwright__browser_navigate_back": 1,
+      "mcp__playwright__browser_console_messages": 1,
+      "Write": 9,
+      "Edit": 6
+    },
+    "skillMentioned": false
+  }
+]
