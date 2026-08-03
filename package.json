@@ -1,0 +1,20 @@
+{
+  "name": "agent-generated-playwright-suite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agent-generated Playwright suite, measured: pass rate, flake, failure taxonomy, and a Claude Skill A/B.",
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "PW_TEST_DIR=smoke playwright test",
+    "lint": "eslint .",
+    "lint:info": "eslint -c eslint.informational.mjs ."
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "eslint": "10.8.0",
+    "eslint-plugin-playwright": "2.11.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0"
+  }
+}
