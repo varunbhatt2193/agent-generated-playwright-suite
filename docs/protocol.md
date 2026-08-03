@@ -19,11 +19,14 @@ agent-generated test suite — and in what specific ways?
   the question.
 - **Generator:** Claude Code CLI 2.1.220, model pinned `claude-opus-5`, run headless (`claude -p`)
   so every run receives the byte-identical prompt with zero human steering.
-- **Browser tools:** `@playwright/mcp` 0.0.78 (exact pin, not `@latest`), default capability set —
-  no `--caps`, no `--codegen` — plus `--headless --isolated` so each session gets a fresh in-memory
-  browser profile. The opt-in `testing`/codegen capabilities exist upstream; they are excluded here
-  because the baseline should reflect what a developer gets without specialist flags. A third arm
-  using them is possible future work.
+- **Browser tools:** `@playwright/mcp` 0.0.78 (exact pin, not `@latest`), launched
+  `--browser chromium --headless --isolated`. `chromium` resolves to the pinned chrome-for-testing
+  build rather than the machine's auto-updating Google Chrome, so the browser stays a fixed quantity
+  across all six runs, and `--isolated` gives each session a fresh in-memory profile so no page state
+  survives from one run into the next. No `--caps` is passed, leaving the optional `vision`, `pdf` and
+  `devtools` groups off; `--codegen` is left at its shipped default of `typescript`. That default is
+  deliberately not overridden — the baseline should be what a developer actually gets from this
+  version, not a configuration tuned for the experiment. Exact tool inventory in `docs/mcp-notes.md`.
 - **No `baseURL`.** The config deliberately omits it: the app is served from a subpath and
   `https://demo.playwright.dev/` is a 404, so a generated `page.goto('/')` would fail for harness
   reasons rather than test-quality ones — contaminating exactly the metric this measures. Tests use
