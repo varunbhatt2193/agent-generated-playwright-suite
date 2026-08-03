@@ -287,7 +287,21 @@ appeared, in either arm, and the skill's rule against it had nothing to prevent.
 
 ## What it cost
 
-Arm B averaged $3.04 per run against arm A's $2.33, roughly 30% more, and took more turns —
-78, 46 and 38 against arm A's 44 and 32. The skill makes the agent work harder. On this evidence it
-buys a higher floor on locator quality and a consistent test structure, and buys nothing at all on
-pass rate, flake or isolation, because there was nothing left to buy.
+Arm A: $2.64, $2.01, $4.87 — mean $3.17, spread $2.86.
+Arm B: $3.71, $2.96, $2.45 — mean $3.04, spread $1.26.
+
+The skill is **not** more expensive. It is very slightly cheaper on average and, more to the point,
+roughly half as variable. Turns tell the same story: arm A ran 44, 32 and 115; arm B ran 78, 46 and
+38. Arm A's third run spiralled to 115 turns and 89 browser calls; nothing in arm B went near that.
+
+That is the same shape as the locator result, and it is the finding this project would put its name
+to. **The skill did not raise the ceiling, it raised the floor.** Arm A's best run was already clean,
+already cheap, already well structured — a skill cannot improve on that. What the skill removed was
+arm A's bad day: the run with eleven CSS selectors, the run that cost $4.87. Locators per run went
+from 1, 12, 3 to 3, 3, 3; cost spread halved; structure became uniform across all three runs.
+
+Averages hide this almost perfectly. Mean cost moved 4%, mean test count 8%, and mean pass rate not at
+all. Anyone running this A/B on means alone would have concluded the skill does nothing.
+
+It buys nothing on pass rate, flake or isolation, because in this baseline there was nothing left to
+buy.
