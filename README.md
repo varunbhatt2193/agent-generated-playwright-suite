@@ -1,14 +1,72 @@
 # Agent-Generated Playwright Suite
 
-Generate an end-to-end Playwright suite with Claude Code and the official Playwright MCP server — then
-**measure what the agent got wrong**. Do it again with a Claude Skill encoding test conventions, and
-report whether the skill actually changed anything.
+**I asked an AI agent to write an automated test suite for a web app — then I measured how good the
+tests actually were, instead of assuming.**
 
-Every raw generated file, every session transcript, every measurement and the protocol that defined
-them are in this repo. The protocol was frozen at the `protocol-frozen` tag before the first run.
+Then I did it a second time, after giving the agent a written guide to good testing practice, to find
+out whether the guide made any difference. Everything the agent produced, every measurement, and the
+rules I committed to *before* running anything are published here.
 
-**Status:** complete. Six generation runs, 402 tests, measured 2026-08-03.
-[`docs/failure-taxonomy.md`](docs/failure-taxonomy.md) is the full analysis.
+**Status:** complete. 6 generation runs, 402 tests, measured 2026-08-03. The 71-test suite in
+[`tests/`](tests/) runs green in CI on every push.
+
+---
+
+## The one-minute version
+
+1. **The task.** Write end-to-end browser tests for [TodoMVC](https://demo.playwright.dev/todomvc)
+   (a small to-do list app) using Playwright, the industry-standard browser automation framework.
+2. **The twist.** A Claude Code agent wrote them, driving a real browser through the Playwright MCP
+   server. I wrote the prompt, not the tests.
+3. **The point.** Anyone can get an AI to emit test files. The hard question is whether they *hold
+   up* — do they pass, do they randomly fail, do they use fragile shortcuts that break the next time a
+   developer changes the page? So I measured all of that: I re-ran every suite 10 times, ran each test
+   alone, ran them all in parallel, linted them against a fixed rule set, and read all 402 by hand.
+4. **The experiment.** Half the runs got a "skill" — a written conventions guide the agent reads
+   automatically. Half didn't. Same prompt, same model, same app. Only that one file differed.
+
+**The headline finding: my automated quality score said the guide made things 10× worse. Reading the
+code showed it made them 13× better.** The score was measuring something it could no longer see. That
+gap — between a metric and the truth — is what this project is really about.
+
+## How it works
+
+```mermaid
+flowchart LR
+  P["Frozen prompt<br/>(identical, all 6 runs)"] --> A
+  P --> B
+  A["<b>Arm A</b><br/>agent alone"] --> A3["3 runs<br/>raw output committed"]
+  B["<b>Arm B</b><br/>agent + conventions skill"] --> B3["3 runs<br/>raw output committed"]
+  A3 --> M
+  B3 --> M
+  M["<b>Measurement</b><br/>10× re-run · run each test alone<br/>run in parallel · lint · read by hand"] --> R["Results<br/>+ failure taxonomy"]
+  R --> S["Best suite promoted<br/>to CI"]
+```
+
+The agent never sees the scoring rules. Each run happens in a stripped-down copy of the repo
+containing four files — no README, no lint config, no git history. Otherwise it would be sitting the
+exam with the answer key on the desk.
+
+## Skills this project demonstrates
+
+| Area | What I used it for |
+|---|---|
+| **Playwright / TypeScript** | Test architecture, page objects, fixtures, web-first assertions, parallel + sharded execution, trace capture |
+| **AI agent engineering** | Claude Code in headless mode, MCP server integration, prompt design, authoring a Claude Skill and A/B testing it |
+| **Test quality analysis** | Flake detection, test isolation and parallel-safety checks, brittle-selector review, a 6-category failure taxonomy |
+| **Measurement & experiment design** | Pre-registered protocol frozen before data collection, one-variable comparison, controlling for machine load, false-positive analysis |
+| **Static analysis** | ESLint flat config, `eslint-plugin-playwright`, a 16-rule quality gate used as a measuring instrument |
+| **CI/CD** | GitHub Actions running the suite and lint on every push, with report artifacts |
+| **Engineering judgement** | Publishing a result that contradicted my own metric, and a repair stage that honestly reported 0% |
+
+## Terms, in plain English
+
+- **Flake** — a test that passes sometimes and fails other times without the app changing. The most
+  expensive failure mode in test automation, because it destroys trust in the whole suite.
+- **Isolation** — each test must pass on its own, not only when the ones before it happen to run first.
+- **Brittle selector** — finding a button by its CSS styling instead of its meaning. It works today and
+  breaks the moment someone redesigns the page.
+- **Arm A / Arm B** — the two halves of the experiment: without the conventions guide, and with it.
 
 ---
 
@@ -139,3 +197,6 @@ node scripts/measure.mjs arms/a-baseline/run-1 /tmp/out --runs 10
 node scripts/lint-suite.mjs arms/a-baseline/run-1 /tmp/out
 scripts/generate-arm.sh a 4                           # a fresh generation run
 ```
+
+**Built with:** Playwright 1.62 · TypeScript 6 · Claude Code (`claude-opus-5`) ·
+`@playwright/mcp` 0.0.78 · ESLint 10 + `eslint-plugin-playwright` · GitHub Actions
